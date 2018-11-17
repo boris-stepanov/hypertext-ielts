@@ -81,7 +81,7 @@ def render_current():
     for task in Task.query.filter_by(group_id=current.step).all():
         lists = []
         for context in task.contexts:
-            content = loads(context.content)
+            content = loads(context.content.decode("utf8"))
             size = len(content) if isinstance(content, list) else reduce(lambda x, y: x + len(y), content.values(), 0)
             lists += [(size, context.term, content)]
         values.update({(bold(task.formulae), task.id): lists})

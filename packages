@@ -1,0 +1,1 @@
+pip virtualenv flask bcrypt pyyaml uwsgi flask-login flask-sqlalchemy flask-wtf

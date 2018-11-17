@@ -1,0 +1,7 @@
+.unsolved:link, .unsolved:visited { color: red; text-decoration: none; }
+.unsolved:hover, .unsolved:active { color: red; text-decoration: underline; }
+.solved:link, .solved:visited { color: green; text-decoration: none; }
+.solved:hover, .solved:active { color: green; text-decoration: underline; }
+.header { font-family: sans-serif; font-size: 17px; font-weight: bold; }
+.content { font-family: sans-serif; font-size: 20px; }
+.task { font-family: serif; font-size: 18px; }

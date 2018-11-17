@@ -1,0 +1,13 @@
+*.swp
+*.pyc
+virtualenv
+__pycache__
+*.db
+*.mypy_cache
+tags
+types.hs
+state.yaml
+tmp
+students.txt
+students.csv
+config.py

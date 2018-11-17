@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+Texts
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-6 col-md-offset-3">
+        <p class="bg-normal">Если Вы впервые на нашей платформе, то рекомендуем ознакомиться с <a href="404.html">инструкцией</a> (Будет добавлено позже).</p>
+    </div>
+</div>
+{% for eid, result in shorts.items() %}
+<div class="row">
+    <div class="col-xs-6 col-md-offset-3 btn-group">
+    {% if result >= 0 %}
+    <a class="solved" href="description/{{ eid }}">Exercise {{ eid }}</a>
+    {% else %}
+    <a class="unsolved" href="description/{{ eid }}">Exercise {{ eid }}</a>
+    {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

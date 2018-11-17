@@ -71,7 +71,7 @@ def render_current():
     if form.validate_on_submit():
         task = Task.query.get(form.task_id.data)
         if g.user.id == 1 or check_answer(form.answer.data, task.formulae,
-                        dict(map(lambda x: (x.term, loads(x.content)), task.contexts))):
+                        dict(map(lambda x: (x.term, loads(x.content.decode("utf8"))), task.contexts))):
             current.next(form.task_id.data)
         else:
             flash("Неправильно!", "error")

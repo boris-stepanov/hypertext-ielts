@@ -33,6 +33,7 @@ Exercise
 
             <p class="bg-normal task"> {{ formulae|safe }} </p>
             <br />
+            <p class="bg-normal">{{ text }}</p>
             <form method="post">
                 {{ form.hidden_tag() }}
                 {{ form.answer(cols=80, rows=3, class_="form-control task", onCopy="return false", onDrag="return false", onDrop="return false", onPaste="return false", autocomplete=off) }}

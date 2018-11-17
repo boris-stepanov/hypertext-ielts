@@ -72,6 +72,7 @@ def render_current():
         task = Task.query.get(form.task_id.data)
         if g.user.id == 1 or check_answer(form.answer.data, task.formulae,
                         dict(map(lambda x: (x.term, loads(x.content.decode("utf8"))), task.contexts))):
+            current.append(form.answer.data)
             current.next(form.task_id.data)
         else:
             flash("Неправильно!", "error")
@@ -85,4 +86,4 @@ def render_current():
             size = len(content) if isinstance(content, list) else reduce(lambda x, y: x + len(y), content.values(), 0)
             lists += [(size, context.term, content)]
         values.update({(bold(task.formulae), task.id): lists})
-    return render_template('exercise.html', values=values, form=form)
+    return render_template('exercise.html', values=values, form=form, text=current.text)

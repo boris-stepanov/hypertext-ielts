@@ -12,6 +12,7 @@ class Try(db.Model):
     __tablename__ = "tries"
     id = db.Column(db.Integer, primary_key=True)
     result = db.Column(db.Integer, index=True, nullable=False)
+    text = db.Column(db.Text, nullable=False)
     started_at = db.Column(db.DateTime)
     finished_at = db.Column(db.DateTime)
     uid = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -21,6 +22,7 @@ class Try(db.Model):
     def __init__(self, user, exercise):
         self.uid = user.id
         self.eid = exercise.id
+        self.text = ""
         self.step = exercise.start_task
         self.result = 0
 
@@ -30,6 +32,10 @@ class Try(db.Model):
         db.session.add(new_try)
         db.session.commit()
         return new_try
+
+    def append(self, sentence):
+        self.text = " ".join([self.text, sentence])
+        db.session.commit()
 
     def start(self):
         self.started_at = datetime.now()

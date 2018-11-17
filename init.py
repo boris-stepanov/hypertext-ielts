@@ -3,24 +3,26 @@
 from json import dumps
 from hashlib import md5
 from string import ascii_letters, digits
+from os.path import exists
 import random
-from functools import reduce
 from yaml import load
 from config import Config
 from source import db
 from source.model.user import UserLogin
 from source.model.exercise import Exercise, Task, Context
+from migrate.versioning import api
+
 
 if "choices" in dir(random):
     choices = random.choices
 else:
-    choices = lambda seq, k: reduce(lambda a, _: a + [random.choice(seq)], [None] * k, [])
+    choices = lambda seq, k: [random.choice(seq) for i in range(k)]
+
 
 def init():
     db.create_all()
 
 def gen_students(students):
-    db.session.add(UserLogin("root", "", "redhothotie"))
     students = open("students.csv", "w")
     for l in students:
         line = l.strip()
@@ -70,6 +72,7 @@ def gen_exercises(exercises):
 
 
 if __name__ == "__main__":
+    init()
     content = load(open("state.yaml"))
     students = open("students.txt", "r")
     db.session.add(UserLogin("guest", "anonymous", "guest"))

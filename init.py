@@ -3,13 +3,18 @@
 from json import dumps
 from hashlib import md5
 from string import ascii_letters, digits
-from random import choices
+import random
+from functools import reduce
 from yaml import load
 from config import Config
 from source import db
 from source.model.user import UserLogin
 from source.model.exercise import Exercise, Task, Context
 
+if "choices" in dir(random):
+    choices = random.choices
+else:
+    choices = lambda seq, k: reduce(lambda a, _: a + [random.choice(seq)], [None] * k, [])
 
 def init():
     db.create_all()

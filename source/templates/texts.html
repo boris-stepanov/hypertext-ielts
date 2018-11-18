@@ -7,21 +7,21 @@ Texts
 {% block content %}
 <div class="row">
     <div class="col-xs-6 col-md-offset-3">
-        <p id="spoiler1" class="bg-normal spoiler" onclick="videoSpoiler('1')">Если Вы впервые на нашей платформе, то рекомендуем ознакомиться с инструкцией.</p>
+        <p class="bg-normal">Если Вы впервые на нашей платформе, то рекомендуем ознакомиться с <span id="spoiler1" class="spoiler" onclick="videoSpoiler('1')">инструкцией.</span></p>
         <div id="video1" class="embed-responsive embed-responsive-16by9 video-instruction">
             <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/_WcE_l1qduQ" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
+<hr/>
     </div>
 </div>
-<hr/>
 <ol>
 {% for eid, result in shorts.items() %}
 <div class="row">
     <div class="col-xs-6 col-md-offset-3 btn-group">
         {% if result >= 0 %}
-        <li class="lead"><a class="solved" href="description/{{ eid }}">Solved</a></li>
+        <li class="lead"><a class="solved" href="description/{{ eid }}">Exercise {{ eid }}</a></li>
         {% else %}
-        <li class="lead"><a class="unsolved" href="description/{{ eid }}">Unsolved</a></li
+        <li class="lead"><a class="unsolved" href="description/{{ eid }}">Exercise {{ eid }}</a></li
         {% endif %}
     </div>
 </div>

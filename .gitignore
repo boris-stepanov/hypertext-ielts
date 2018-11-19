@@ -8,6 +8,5 @@ tags
 types.hs
 state.yaml
 tmp
-students.txt
-students.csv
+students*
 config.py

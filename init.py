@@ -34,7 +34,7 @@ def gen_students(students):
             login = "user_" + md5(line.encode('utf8')).hexdigest()[:8]
             password = ''.join(choices(ascii_letters + digits, k=8))
             db.session.add(UserLogin(login, group, password))
-            students.write("{}\t{}\t{}\n".format(login, password, line))
+            students.write("{},{},{}\n".format(login, password, line))
     db.session.commit()
 
 def gen_contexts(contexts):

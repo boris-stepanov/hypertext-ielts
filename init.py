@@ -10,7 +10,6 @@ from config import Config
 from source import db
 from source.model.user import UserLogin
 from source.model.exercise import Exercise, Task, Context
-from migrate.versioning import api
 
 
 if "choices" in dir(random):
@@ -22,19 +21,19 @@ else:
 def init():
     db.create_all()
 
-def gen_students(students):
-    students = open("students.csv", "w")
-    for l in students:
+def gen_students(input):
+    output = open("students.csv", "a")
+    for l in input:
         line = l.strip()
         print(line)
         if line[:2] == "__":
             group = line[2:]
-            students.write("{}\n\n".format(group))
+            students.write("\n{}\n\n".format(group))
         elif line:
             login = "user_" + md5(line.encode('utf8')).hexdigest()[:8]
             password = ''.join(choices(ascii_letters + digits, k=8))
             db.session.add(UserLogin(login, group, password))
-            students.write("{},{},{}\n".format(login, password, line))
+            students.output("{}\t{}\t{}\n".format(login, password, line))
     db.session.commit()
 
 def gen_contexts(contexts):
@@ -75,5 +74,4 @@ if __name__ == "__main__":
     init()
     content = load(open("state.yaml"))
     students = open("students.txt", "r")
-    db.session.add(UserLogin("guest", "anonymous", "guest"))
     db.session.commit()

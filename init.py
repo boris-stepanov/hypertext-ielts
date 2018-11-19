@@ -3,13 +3,12 @@
 from json import dumps
 from hashlib import md5
 from string import ascii_letters, digits
-from os.path import exists
 import random
 from yaml import load
-from config import Config
+# from config import Config
 from source import db
 from source.model.user import UserLogin
-from source.model.exercise import Exercise, Task, Context
+from source.model.exercise import Exercise, Task, Context, TaskGroup
 
 
 if "choices" in dir(random):
@@ -18,8 +17,10 @@ else:
     choices = lambda seq, k: [random.choice(seq) for i in range(k)]
 
 
+
 def init():
     db.create_all()
+
 
 def gen_students(input):
     output = open("students.csv", "a")
@@ -32,9 +33,10 @@ def gen_students(input):
         elif line:
             login = "user_" + md5(line.encode('utf8')).hexdigest()[:8]
             password = ''.join(choices(ascii_letters + digits, k=8))
-            db.session.add(UserLogin(login, group, password))
+            db.session.add(UserLogin.init(login, group, password))
             students.output("{}\t{}\t{}\n".format(login, password, line))
     db.session.commit()
+
 
 def gen_contexts(contexts):
     for context in contexts:
@@ -46,32 +48,31 @@ def gen_contexts(contexts):
             for i in items[1]:
                 merged.update(i)
             bs = bytes(dumps(merged), "utf8")
-        db.session.add(Context(items[0], bs))
+        db.session.add(Context(term=items[0], content=bs))
     db.session.commit()
 
+
 def gen_exercises(exercises):
-    counter = 1
+    gid = 0
     for exercise in exercises:
-        db.session.add(Exercise(exercise['url'], counter))
+        next = None
         groups = exercise['groups']
-        limit = counter + len(groups) - 1
+        groups.reverse()
         for group in groups:
-            if counter == limit:
-                next = None
-            else:
-                next = counter + 1
+            db.session.add(TaskGroup(next_group=next))
+            gid += 1
+            next = gid
             for task in group:
-                item = Task(counter, task, next)
-                db.session.add(item)
-                db.session.commit()
-                item.parse_formulae()
-                db.session.commit()
-            counter += 1
+                db.session.add(Task.init(gid, task))
+        db.session.add(Exercise(description_url=exercise['url'], start_task=next))
     db.session.commit()
 
 
 if __name__ == "__main__":
     init()
     content = load(open("state.yaml"))
-    students = open("students.txt", "r")
+    db.session.add(UserLogin.init("guest", "anonymous", "guest"))
+    gen_contexts(content["contexts"])
+    gen_exercises(content["exercises"])
     db.session.commit()
+    students = open("students.txt", "r")

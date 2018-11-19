@@ -2,7 +2,7 @@ from functools import reduce
 from json import loads
 from flask_login import login_required
 from flask import render_template, redirect, request, g, url_for, flash
-from .. import source, check_answer
+from source import source, check_answer, db
 from ..model.exercise import Exercise, Try, Task
 from ..form.exercise import TaskForm
 from ..form.login import HiddenForm
@@ -19,6 +19,7 @@ def bold(formulae):
         state = not state
     return res
 
+
 @source.route('/description/<eid>', methods=['GET', 'POST'])
 @login_required
 def description(eid):
@@ -31,7 +32,9 @@ def description(eid):
             if request.form['send_button'] == "back":
                 return redirect(url_for('exercise'))
             elif request.form['send_button'] == "start":
-                new_try = Try.init_try(g.user, ex)
+                new_try = Try.init(g.user, ex)
+                db.session.add(new_try)
+                db.session.commit()
                 new_try.start()
                 return redirect(url_for('exercise'))
             else:
@@ -73,7 +76,7 @@ def render_current():
         if g.user.id == 1 or check_answer(form.answer.data, task.formulae,
                         dict(map(lambda x: (x.term, loads(x.content.decode("utf8"))), task.contexts))):
             current.append(form.answer.data)
-            current.next(form.task_id.data)
+            current.next()
         else:
             flash("Неправильно!", "error")
         return redirect(url_for('exercise'))

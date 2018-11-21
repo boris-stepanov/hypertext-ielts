@@ -10,3 +10,5 @@ state.yaml
 tmp
 students*
 config.py
+errordocs
+migrate.py

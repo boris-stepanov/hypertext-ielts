@@ -1,10 +1,12 @@
-from time import time
+from datetime import datetime
+from os.path import join
 import re
+from config import basename
 
 
 def log(msg):
-    with open("tmp/mylog", "a") as fout:
-        fout.write("{}:\t{}\n".format(int(time()), repr(msg)))
+    with open(join(basename, "tmp/mylog"), "a") as fout:
+        fout.write("{}:\t{}\n".format(datetime.now(), repr(msg)))
 
 
 def check_answer(answer, formulae, contexts):

@@ -7,8 +7,7 @@ import random
 from yaml import load
 # from config import Config
 from source import db
-from source.model.user import UserLogin
-from source.model.exercise import Exercise, Task, Context, TaskGroup
+from source.model import UserLogin, Exercise, Task, Context, TaskGroup
 
 
 if "choices" in dir(random):

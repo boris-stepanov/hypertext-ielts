@@ -1,6 +1,6 @@
 from typing import List, Dict, Optional, Type
 from datetime import datetime
-from bcrypt import hashpw
+from bcrypt import hashpw, gensalt
 from flask import flash
 from source import db, log, lm
 
@@ -72,6 +72,11 @@ class UserLogin(db.Model):
         db.session.add(user)
         db.session.commit()
         return user
+
+    def update_password(self, password):
+        log("User {} changes the password".format(self.login))
+        self.hash = hashpw(bytes(password, "utf8"), gensalt())
+        db.session.commit()
 
     def check_password(self, password: str) -> bool:
         """

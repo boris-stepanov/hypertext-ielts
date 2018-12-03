@@ -7,7 +7,7 @@ Description
 {% block content %}
 <div class="row">
     <div class="col-xs-6 col-md-offset-3">
-    <img src={{ url_for('static', filename="images/ex1.jpg") }}>
+       <img src={{ url_for('static', filename='images/descriptions/{}.jpg'.format(exercise.id)) }}>
     </div>
 </div>
 <div class="row">

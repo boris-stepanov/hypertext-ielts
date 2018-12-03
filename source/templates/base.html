@@ -17,8 +17,8 @@
                     <li><p class="navbar-text">HyperText</p></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li><a href='{{ url_for("texts") }}' class="navbar-link">Profile</a></li>
                     {% if g.login.is_authenticated %}
-                    <li><a href='{{ url_for("exercise") }}' class="navbar-link">Exercise</a></li>
                     <li><a href='{{ url_for("logout") }}' class="navbar-link">Log out</a></li>
                     {% else %}
                     <li><a href='{{ url_for("login") }}' class="navbar-link">Log in</a></li>

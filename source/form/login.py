@@ -2,7 +2,7 @@ from flask import flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import Regexp, Length
-from ..model.user import UserLogin
+from ..model import UserLogin
 
 LOGIN_REGEX = Regexp(r'^[\w\-\_]{3,20}$')
 

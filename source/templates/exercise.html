@@ -7,7 +7,13 @@ Exercise
 {% block content %}
 <div class="row">
     <div class="col-xs-6 col-md-offset-3">
-        <p class="bg-normal">Выберите любое предложение, чтобы начать делать задание.</p>
+       <img src={{ url_for('static', filename='images/descriptions/{}.jpg'.format(eid)) }}>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-6 col-md-offset-3">
+        <p class="bg-normal">Выберите любое предложение, чтобы начать делать задание.<br />
+        Напишите предложение по формуле, вставив вместо переменных любое выражение из соответствующего списка.</p>
     </div>
 </div>
 <div class="row">
@@ -29,14 +35,12 @@ Exercise
 <div class="row">
     <div class="col-xs-6 col-md-offset-3">
         <div id="block{{tid}}" style="display:none;">
-            <p class="bg-normal">Напишите предложение по формуле, вставив вместо переменных любое выражение из соответствующего списка.</p>
-
             <p class="bg-normal task"> {{ formulae|safe }} </p>
             <br />
-            <p class="bg-normal">{{ text }}</p>
+            <div class="well well-sm">{{ text}}...</div>
             <form method="post">
                 {{ form.hidden_tag() }}
-                {{ form.answer(cols=80, rows=3, class_="form-control task", onCopy="return false", onDrag="return false", onDrop="return false", onPaste="return false", autocomplete=off) }}
+                {{ form.answer(cols=80, rows=1, class_="form-control task", onCopy="return false", onDrag="return false", onDrop="return false", onPaste="return false", autocomplete=off) }}
                 <input type="text" name="task_id" value="{{ tid }}" hidden="true">
                 <input type="submit" class="btn btn-primary" name="check" value="check">
             </form>

@@ -17,7 +17,6 @@ else:
     choices = lambda seq, k: [random.choice(seq) for i in range(k)]
 
 
-
 def init():
     db.create_all()
 
@@ -33,7 +32,7 @@ def gen_students(input):
         elif line:
             login = "user_" + md5(line.encode('utf8')).hexdigest()[:8]
             password = ''.join(choices(ascii_letters + digits, k=8))
-            db.session.add(UserLogin.init(login, group, password))
+            UserLogin.init(login, group, password)
             students.output("{}\t{}\t{}\n".format(login, password, line))
     db.session.commit()
 
@@ -63,7 +62,7 @@ def gen_exercises(exercises):
             gid += 1
             next = gid
             for task in group:
-                db.session.add(Task.init(gid, task))
+                Task.init(gid, task)
         db.session.add(Exercise(description_url=exercise['url'], start_task=next))
     db.session.commit()
 
@@ -71,7 +70,7 @@ def gen_exercises(exercises):
 if __name__ == "__main__":
     init()
     content = load(open("state.yaml"))
-    db.session.add(UserLogin.init("guest", "anonymous", "guest"))
+    UserLogin.init("guest", "anonymous", "guest")
     gen_contexts(content["contexts"])
     gen_exercises(content["exercises"])
     db.session.commit()

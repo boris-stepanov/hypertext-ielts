@@ -40,6 +40,11 @@ class TestCase(unittest.TestCase):
         assert check_answer("ND11ND11", "$NORMAL_DICT$$INTERFERENCE_DICT$", self.contexts)
         assert check_answer("1 SL1 2 ND21 3", "1 $SIMPLE_LIST$ 2 $NORMAL_DICT$ 3", self.contexts)
 
+    def test_specials(self):
+        assert check_answer("A(B)C", "A(B)C", self.contexts)
+        assert check_answer("[", "[", self.contexts)
+        assert not check_answer("A", ".", self.contexts)
+
     def test_flat(self):
         assert flat(self.contexts) == {"SIMPLE_LIST": {"SL1"},
                                        "SIMPLE_DICT": {"SD11"},

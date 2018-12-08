@@ -4,7 +4,6 @@ Pure backend code
 from typing import Dict, List, Union
 from datetime import datetime
 from os.path import join
-import re
 from config import basename
 
 
@@ -22,25 +21,45 @@ def list_user_tries(default: Dict[int, List[Union[int, bool]]], tries) -> None:
             default[eid][1] = True
 
 
-def check_answer(answer: str, formulae: str, contexts) -> bool:
-    state = True
+def check_answer(answer: str, formulae: str, contexts) -> Union[bool, int]:
     flatten = flat(contexts)
-    parts = []
-    for i in formulae.split('$'):
-        if state:
-            parts.append(replace_special(i))
-        else:
-            parts.append("({})".format("|".join(flatten[i])))
-        state = not state
-    pat = "".join(parts)
-    return bool(re.fullmatch(pat, answer.strip(), re.IGNORECASE))
+    parts = formulae.split('$')
+    cdr = drop(answer, parts[0])
+    if isinstance(cdr, int):
+        return cdr
+    res = recursive_check(cdr, parts[1:], flatten)
+    if res is True:
+        return True
+    return res + len(parts[0])
 
 
-def replace_special(formulae: str) -> str:
-    special = {'(', ')', '[', ']', '.', '*', '^', '?', '+', '{', '}', '|'}
-    for i in special:
-        formulae = formulae.replace(i, "\\"+i)
-    return formulae
+def drop(answer: str, part: str):
+    for pos, char in enumerate(part):
+        if not answer or answer[0] != char:
+            return pos
+        answer = answer[1:]
+    return answer
+
+
+def recursive_check(answer: str, parts: List[str], contexts: Dict[str, str]):
+    if not answer and not parts:
+        return True
+    if not answer or not parts:
+        return 0
+    res = 0
+    for context in contexts[parts[0]]:
+        cdr = drop(answer, context)
+        if isinstance(cdr, int):
+            continue
+        cdr = drop(cdr, parts[1])
+        if isinstance(cdr, int):
+            res = max(res, len(context) + cdr)
+            continue
+        i = recursive_check(cdr, parts[2:], contexts)
+        if i is True:
+            return True
+        res = max(res, len(context) + i + len(parts[1]))
+    return res
 
 
 def flat(contexts):

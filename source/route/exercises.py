@@ -67,20 +67,21 @@ def exercise(eid: str) -> str:
         current.finish(False)
         return redirect(url_for('texts'))
 
-    log(current)
     if form.validate_on_submit():
         task = Task.query.get(form.task_id.data)
-        if True or current_user.get_id() == 1 or \
-           check_answer(form.answer.data,
-                        task.formulae,
-                        dict(map(lambda x: (x.term,
-                                            loads(x.content.decode("utf8"))),
-                                 task.contexts))):
+        answer = form.answer.data.strip()
+        result = check_answer(answer, task.formulae,
+                              dict(map(lambda x: (x.term,
+                                                  loads(x.content.decode("utf8"))),
+                                       task.contexts)))
+        if current_user.get_id() == 1 or result is True:
             current.append(form.answer.data)
             if current.next():
                 return redirect(url_for('texts'))
         else:
-            flash("Неправильно!", "error")
+            err_msg = "".join([answer[:result], "<mark>",
+                               answer[result:], "</mark>"])
+            flash("Неправильно! {}".format(err_msg), "error")
         return redirect(url_for('exercise', eid=eid))
 
     values: Dict[Tuple[str, int], List[Tuple[int, str, str]]] = {}

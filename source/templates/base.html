@@ -30,7 +30,7 @@
         {% if messages %}
         {% for category, message in messages %}
             {% if category == 'error' %}
-                <div class="alert alert-danger" role="alert">{{ message }}</div>
+                <div class="alert alert-danger" role="alert">{{ message|safe }}</div>
             {% elif category == 'success' %}
                 <div class="alert alert-success" role="alert">{{ message }}</div>
             {% else %}

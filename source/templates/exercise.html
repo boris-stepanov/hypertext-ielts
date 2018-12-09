@@ -5,82 +5,121 @@ Exercise
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-xs-6 col-md-offset-3">
-       <img src={{ url_for('static', filename='images/descriptions/{}.jpg'.format(eid)) }}>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-6 col-md-offset-3">
-        <p class="lead">Выберите любое предложение, чтобы начать делать задание.<br />
-        Напишите предложение по формуле, вставив вместо переменных любое выражение из соответствующего списка.</p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-6 col-md-offset-3 btn-group">
-        <button id="sentenceChoose" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-hashpop="true" aria-expanded="true">
-            Выберите предложение<span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="sentenceChoose">
-            {% for (formulae, tid) in values.keys() %}
-            <li><a href="#" onclick="spoiler({{ tid }})">{{ formulae|safe }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="col-xs-6 col-md-offset-3">
-    <hr>
-    </div>
-</div>
-{% for (formulae, tid), contexts in values.items() %}
-<div class="row">
-    <div class="col-xs-6 col-md-offset-3">
-        <div id="block{{tid}}" style="display:none;">
-            <p class="bg-normal task"> {{ formulae|safe }} </p>
-            <br />
-            <div class="well well-sm">{{ text}}...</div>
+<div class="container">
+   {% with messages = get_flashed_messages(with_categories=True) %}
+   {% for category, message in messages %}
+   {% if category == 'error' %}
+   <div class="row">
+      <div class="col">
+         <div class="alert alert-danger" role="alert">{{ message|safe }}</div>
+      </div>
+   </div>
+   {% elif category == 'success' %}
+   <div class="row">
+      <div class="col">
+         <div class="alert alert-success" role="alert">{{ message|safe }}</div>
+      </div>
+   </div>
+   {% endif %}
+   {% endfor %}
+   {% endwith %}
+   <div class="row pb-3">
+      <div class="col">
+         <img class="img-fluid" src={{ url_for('static', filename='images/descriptions/{}.jpg'.format(eid)) }}>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col">
+         <p class="lead">Выберите любое предложение, чтобы начать делать задание.<br />
+         Напишите предложение по формуле, вставив вместо переменных любое выражение из соответствующего списка.</p>
+      </div>
+   </div>
+   <div class="row pb-3">
+      <div class="col">
+         <div class="dropdown">
+            <button id="sentenceChoose" class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-hashpop="true" aria-expanded="true">
+               Выберите предложение
+            </button>
+            <div class="dropdown-menu" aria-labelledby="sentenceChoose">
+               {% for (formulae, tid) in values.keys() %}
+               <button class="dropdown-item" type="button" onclick="spoiler({{ tid }})">{{ formulae|safe }}</button>
+               {% endfor %}
+            </div>
+         </div>
+      </div>
+   </div>
+
+   {% for (formulae, tid), contexts in values.items() %}
+   <div id="block{{tid}}" style="display:none;">
+
+      <div class="row">
+         <div class="col">
+            <span class="bg-normal task">{{ formulae|safe }}</span>
+         </div>
+      </div>
+
+      {% if text %}
+      <div class="row pt-2">
+         <div class="col">
+            <div class="card border-dark">
+               <div class="card-body text-dark">
+                  {{text}}..
+               </div>
+            </div>
+         </div>
+      </div>
+      {% endif %}
+
+      <div class="row pt-2">
+         <div class="col">
             <form method="post">
-                {{ form.hidden_tag() }}
-                {{ form.answer(cols=80, rows=1, class_="form-control task", onCopy="return false", onDrag="return false", onDrop="return false", onPaste="return false", autocomplete=off) }}
-                <input type="text" name="task_id" value="{{ tid }}" hidden="true">
-                <input type="submit" class="btn btn-primary" name="check" value="check">
+               {{ form.hidden_tag() }}
+               {{ form.answer(cols=80, rows=1, class_="form-control task", onCopy="return false", onDrag="return false", onDrop="return false", onPaste="return false", autocomplete=off) }}
+               <input type="text" name="task_id" value="{{ tid }}" hidden="true">
+               <input type="submit" class="btn btn-primary" name="check" value="check">
             </form>
-            <br />
-            {% for (size, term, content) in contexts %}
-            <table class="table table-striped table-bordered task" style="width:auto;">
-                <tr><th colspan={{ size }}> {{ term }}</th></tr>
-                {% if content is mapping %}
-                <tr>
-                    {% for th, cnt in content.items() %}
-                    <th colspan={{ cnt|length }}>{{ th }}</th>
-                    {% endfor %}
-                </tr>
-                <tr>
-                    {% for th, cnt in content.items() %}
-                    {% for i in cnt %}
-                    <td>{{ i }}</td>
-                    {% endfor %}
-                    {% endfor %}
-                </tr>
-                {% else %}
-                <tr>
-                    {% for i in content %}
-                    <td>{{ i }}</td>
-                    {% endfor %}
-                </tr>
-                {% endif %}
+         </div>
+      </div>
+
+      <div class="row pt-2">
+         {% for (size, term, content) in contexts %}
+         <div class="col-auto">
+            <table class="table table-sm table-striped table-bordered" style="width:auto;">
+               <tr>
+                  <th colspan={{ size }}>{{ term }}</th>
+               </tr>
+               {% if content is mapping %}
+               <tr>
+                  {% for th, cnt in content.items() %}
+                  <th colspan={{ cnt|length }}>{{ th }}</th>
+                  {% endfor %}
+               </tr>
+               <tr>
+                  {% for th, cnt in content.items() %}
+                  {% for i in cnt %}
+                  <td>{{ i }}</td>
+                  {% endfor %}
+                  {% endfor %}
+               </tr>
+               {% else %}
+               <tr>
+                  {% for i in content %}
+                  <td>{{ i }}</td>
+                  {% endfor %}
+               </tr>
+               {% endif %}
             </table>
-            <br />
-            {% endfor %}
-            <hr>
-        </div>
-    </div>
-</div>
-{% endfor %}
-<div class="row">
-    <div class="col-xs-6 col-md-offset-3">
-        <form method="post">
-        <button type="submit" method="post" class="btn btn-danger" name="cancel" value="cancel">Cancel</button>
-        </form>
-    </div>
+         </div>
+         {% endfor %}
+      </div>
+   </div>
+   {% endfor %}
+   <div class="row">
+      <div class="col pt-3">
+         <form method="post">
+            <button type="submit" method="post" class="btn btn-danger" name="cancel" value="cancel">Отменить</button>
+         </form>
+      </div>
+   </div>
 </div>
 {% endblock %}

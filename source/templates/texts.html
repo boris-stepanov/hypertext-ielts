@@ -5,34 +5,46 @@ Texts
 {% endblock %}
 
 {% block content %}
-<div class="row">
-   <div class="col-xs-6 col-md-offset-3">
-      <p class="bg-normal">Если Вы впервые на нашей платформе, то рекомендуем ознакомиться с <span id="spoiler1" class="spoiler" onclick="videoSpoiler('1')">инструкцией.</span></p>
-      <div id="video1" class="embed-responsive embed-responsive-16by9 video-instruction">
-         <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/_WcE_l1qduQ" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      </div>
-      <hr/>
-   </div>
-</div>
-<ol>
-   {% for eid, result in shorts.items() %}
+<div class="container">
+   {% with messages = get_flashed_messages(with_categories=True) %}
+   {% for category, message in messages %}
+   {% if category == 'success' %}
    <div class="row">
-      <div class="col-xs-6 col-md-offset-3 btn-group">
-         <li class="lead">
-            {% if result[0] %}
-            <a class="solved" href="description/{{ eid }}">Finished {{ result[0] }} times.</a>
-               {% if result[1] %}
-               <i>In progress</i>
-               {% endif %}
-            {% else %}
-            <a class="unsolved" href="description/{{ eid }}">Didn't finished yet</a>
-               {% if result[1] %}
-               <i>In progress</i>
-               {% endif %}
-            {% endif %}
-         </li>
+      <div class="col">
+         <div class="alert alert-success" role="alert">{{ message|safe }}</div>
       </div>
    </div>
+   {% endif %}
    {% endfor %}
-</ol>
+   {% endwith %}
+   <div class="row pb-3">
+      <div class="col">
+         <p class="bg-normal">Если Вы впервые на нашей платформе, то рекомендуем ознакомиться с <span id="spoiler1" class="spoiler" onclick="videoSpoiler('1')">инструкцией.</span></p>
+         <div id="video1" class="embed-responsive embed-responsive-16by9 video-instruction">
+            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/_WcE_l1qduQ" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+         </div>
+      </div>
+   </div>
+   <ol>
+      {% for eid, result in shorts.items() %}
+      <div class="row">
+         <div class="btn-group">
+            <li class="lead">
+               {% if result[0] %}
+               <a class="solved" href="description/{{ eid }}">Пройдено {{ result[0] }} hfp.</a>
+               {% if result[1] %}
+               <i>В процессе.</i>
+               {% endif %}
+               {% else %}
+               <a class="unsolved" href="description/{{ eid }}">Не пройдено.</a>
+               {% if result[1] %}
+               <i>В процессе.</i>
+               {% endif %}
+               {% endif %}
+            </li>
+         </div>
+      </div>
+      {% endfor %}
+   </ol>
+</div>
 {% endblock %}

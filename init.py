@@ -62,7 +62,7 @@ def gen_exercises(exercises):
             next = gid
             for task in group:
                 Task.init(gid, task)
-        db.session.add(Exercise(description_url=exercise['url'], start_task=next))
+        db.session.add(Exercise(description_url='', start_task=next))
     db.session.commit()
 
 

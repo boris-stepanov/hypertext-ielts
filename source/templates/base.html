@@ -1,44 +1,28 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>{% block title %}{% endblock %} - Essay</title>
-        <link rel="stylesheet" href={{ url_for('static', filename="bootstrap.min.css") }}>
-        <link rel="stylesheet" href={{ url_for('static', filename="style.css") }}>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script type="text/javascript" src={{ url_for('static', filename="script.js") }}></script>
-        <script type="text/javascript" src={{ url_for('static', filename="bootstrap.min.js") }}></script>
-        {% block head %}{% endblock %}
-    </head>
-    <body>
-        <nav class="header navbar navbar-default navbar-top">
-            <div class="container-fluid">
-                <ul class="nav navbar-nav">
-                    <li><p class="navbar-text">HyperText</p></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    {% if g.login.is_authenticated %}
-                    <li><a href='{{ url_for("exercise") }}' class="navbar-link">Exercise</a></li>
-                    <li><a href='{{ url_for("logout") }}' class="navbar-link">Log out</a></li>
-                    {% else %}
-                    <li><a href='{{ url_for("login") }}' class="navbar-link">Log in</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        </nav>
-        {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-        {% for category, message in messages %}
-            {% if category == 'error' %}
-                <div class="alert alert-danger" role="alert">{{ message }}</div>
-            {% elif category == 'success' %}
-                <div class="alert alert-success" role="alert">{{ message }}</div>
+   <head>
+      <meta charset="utf-8">
+      <title>{% block title %}{% endblock %} - Essay</title>
+      <link rel="stylesheet" href={{ url_for('static', filename="bootstrap.min.css") }}>
+      <link rel="stylesheet" href={{ url_for('static', filename="style.css") }}>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script type="text/javascript" src={{ url_for('static', filename="script.js") }}></script>
+      <script type="text/javascript" src={{ url_for('static', filename="popper.min.js") }}></script>
+      <script type="text/javascript" src={{ url_for('static', filename="bootstrap.min.js") }}></script>
+      {% block head %}{% endblock %}
+   </head>
+   <body>
+      <nav class="header navbar navbar-expand-lg navbar-light bg-light">
+         <span class="navbar-brand h1">HyperText</span>
+         <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a href='{{ url_for("texts") }}' class="nav-link">Упражнения</a></li>
+            {% if g.login.is_authenticated %}
+            <li class="nav-item"><a href='{{ url_for("logout") }}' class="nav-link">Выйти</a></li>
             {% else %}
-                <div class="alert alert-warning" role="alert">{{ message }}</div>
+            <li class="nav-item"><a href='{{ url_for("login") }}' class="nav-link">Войти</a></li>
             {% endif %}
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-        <div id="content">{% block content %}{% endblock %}</div>
-    </body>
+         </ul>
+      </nav>
+      {% block content %}{% endblock %}
+   </body>
 </html>

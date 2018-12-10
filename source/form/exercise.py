@@ -1,5 +1,5 @@
 from source import db, log
-from ..model.user import UserLogin
+from ..model import UserLogin
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, IntegerField
 from wtforms.validators import InputRequired

@@ -1,8 +1,12 @@
-from datetime import datetime
-from flask import render_template, g, redirect, url_for
-from source import db, source
-from flask_login import current_user
+"""
+Common routes: errors, login handlers, etc
+"""
+
 from functools import wraps
+from datetime import datetime
+from source import db, source
+from flask import render_template, g, redirect, url_for
+from flask_login import current_user
 
 
 def login_required(f):

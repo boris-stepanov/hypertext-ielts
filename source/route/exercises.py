@@ -1,14 +1,21 @@
+"""
+All exercise related routes
+"""
+from typing import Dict, List, Tuple
 from functools import reduce
 from json import loads
-from flask_login import login_required
-from flask import render_template, redirect, request, g, url_for, flash
-from source import source, check_answer, db
-from ..model.exercise import Exercise, Try, Task
+from flask import render_template, redirect, request, url_for, flash
+from flask_login import current_user
+from source import source, check_answer, list_user_tries, db, log
+from ..model import Exercise, Try, Task
 from ..form.exercise import TaskForm
 from ..form.login import HiddenForm
 
 
-def bold(formulae):
+def bold(formulae: str) -> str:
+    """
+    Replace '$' in formulas with bold tag
+    """
     state = False
     res = ""
     for i in formulae.split('$'):
@@ -20,73 +27,76 @@ def bold(formulae):
     return res
 
 
+@source.route('/texts', methods=['GET', 'POST'])
+def texts():
+    exercises = Exercise.query.all()
+    shorts = {record.id: [0, False] for record in exercises}
+    # shorts: Dict[int, Tuple[bool, bool]]
+    list_user_tries(shorts, current_user.get_tries())
+    return render_template('texts.html', shorts=shorts)
+
+
 @source.route('/description/<eid>', methods=['GET', 'POST'])
-@login_required
-def description(eid):
-    if g.user.in_action():
-        return redirect(url_for('exercise'))
+def description(eid: str) -> str:
+    if current_user.get_try(int(eid)):
+        return redirect(url_for('exercise', eid=eid))
+
     ex = Exercise.query.get_or_404(eid)
     form = HiddenForm()
     if form.validate_on_submit():
         if request.method == 'POST':
             if request.form['send_button'] == "back":
-                return redirect(url_for('exercise'))
-            elif request.form['send_button'] == "start":
-                new_try = Try.init(g.user, ex)
-                db.session.add(new_try)
-                db.session.commit()
-                new_try.start()
-                return redirect(url_for('exercise'))
-            else:
-                pass
+                return redirect(url_for('texts'))
+
+            if request.form['send_button'] == "start":
+                new_try = Try.init(current_user, ex)
+                db.session.refresh(new_try)
+                return redirect(url_for('exercise', eid=eid))
+
     return render_template("description.html", exercise=ex, form=form)
 
 
-@source.route('/exercise', methods=['GET', 'POST'])
-@login_required
-def exercise():
-    if g.user.in_action():
-        return render_current()
-    else:
-        return render_list()
-
-
-def render_list():
-    exercises = Exercise.query.all()
-    shorts = {record.id: -1 for record in exercises}
-    tries = g.user.tries
-    for i in tries:
-        if i.finished_at is not None and\
-           i.result >= 0 and\
-           (i.result < shorts[i.eid] or shorts[i.eid] == -1):
-            shorts[i.eid] = i.result
-    return render_template('texts.html', shorts=shorts)
-
-
-def render_current():
+@source.route('/exercise/<eid>', methods=['GET', 'POST'])
+def exercise(eid: str) -> str:
+    current = current_user.get_try(int(eid))
+    if not current:
+        return redirect(url_for('description', eid=eid))
     form = TaskForm()
-    current = g.user.tries[-1]
 
     if 'cancel' in request.form:
         current.finish(False)
-        return redirect(url_for('exercise'))
+        return redirect(url_for('texts'))
 
     if form.validate_on_submit():
         task = Task.query.get(form.task_id.data)
-        if g.user.id == 1 or check_answer(form.answer.data, task.formulae,
-                        dict(map(lambda x: (x.term, loads(x.content.decode("utf8"))), task.contexts))):
+        answer = form.answer.data.strip()
+        result = check_answer(answer, task.formulae,
+                              dict(map(lambda x: (x.term,
+                                                  loads(x.content.decode("utf8"))),
+                                       task.contexts)))
+        if current_user.get_id() == 1 or result is True:
             current.append(form.answer.data)
-            current.next()
+            if current.next():
+                return redirect(url_for('texts'))
         else:
-            flash("Неправильно!", "error")
-        return redirect(url_for('exercise'))
+            err_msg = "".join([answer[:result], "<mark>",
+                               answer[result:], "</mark>"])
+            flash("Неправильно! {}".format(err_msg), "error")
+        return redirect(url_for('exercise', eid=eid))
 
-    values = {}
+    values: Dict[Tuple[str, int], List[Tuple[int, str, str]]] = {}
     for task in Task.query.filter_by(group_id=current.step).all():
-        lists = []
+        lists: List[Tuple[int, str, str]] = []
         for context in task.contexts:
             content = loads(context.content.decode("utf8"))
-            size = len(content) if isinstance(content, list) else reduce(lambda x, y: x + len(y), content.values(), 0)
+            if isinstance(content, list):
+                size = len(content)
+            else:
+                size = reduce(lambda x, y: x + len(y), content.values(), 0)
             lists += [(size, context.term, content)]
         values.update({(bold(task.formulae), task.id): lists})
-    return render_template('exercise.html', values=values, form=form, text=current.text)
+    return render_template('exercise.html',
+                           eid=eid,
+                           values=values,
+                           form=form,
+                           text=current.text)

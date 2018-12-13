@@ -27,12 +27,12 @@ def gen_students(input):
         print(line)
         if line[:2] == "__":
             group = line[2:]
-            students.write("\n{}\n\n".format(group))
+            output.write("\n{}\n\n".format(group))
         elif line:
             login = "user_" + md5(line.encode('utf8')).hexdigest()[:8]
             password = ''.join(choices(ascii_letters + digits, k=8))
             UserLogin.init(login, group, password)
-            students.output("{}\t{}\t{}\n".format(login, password, line))
+            output.output("{}\t{}\t{}\n".format(login, password, line))
     db.session.commit()
 
 
